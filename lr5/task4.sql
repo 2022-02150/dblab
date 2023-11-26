@@ -1,5 +1,7 @@
 --  Рассчитайте количество аренд каждого из объектов клуба.
 USE cd;
-SELECT facid, COUNT(*) 
-FROM bookings  
-GROUP BY facid;
+SELECT facility, sum(b.slots) AS 'Количество аренд' 
+FROM facilities f 
+INNER JOIN bookings AS b ON b.facid = f.facid 
+GROUP BY f.facid;
+
