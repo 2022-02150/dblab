@@ -1,16 +1,12 @@
  -- Выберите процент использования объектов по месяцам, упорядочив по возрастанию
 USE cd;
-
-WITH slots as (
-  SELECT facility, SUM(book.slots) as rent_count,
-      DATE_FORMAT(book.starttime, "%m %Y") as date
-    FROM facilities as fac
-      JOIN bookings as book ON book.facid = fac.facid
-    GROUP BY fac.facid, date
-)
-SELECT s1.facility, CONCAT(ROUND(s1.rent_count / SUM(s2.rent_count) * 100, 1), '%') as usability,
-    s1.date
-  FROM slots as s1
-    JOIN slots as s2 ON s1.date = s2.date
-  GROUP BY s1.facility, s1.rent_count, s1.date
-  ORDER BY CAST(usability as FLOAT) ASC;
+WITH slots AS (SELECT facility, SUM(b.slots) AS bookcost,   
+DATE_FORMAT(b.starttime, '%y.%m') AS Год_Месяц
+FROM facilities f
+JOIN bookings b ON b.facid = f.facid
+GROUP BY f.facid, Год_Месяц)
+SELECT slot1.facility AS facility, ROUND(slot1.bookcost / SUM(slot2.bookcost) * 100, 1) AS usage_percent, slot1.Год_Месяц
+FROM slots AS slot1
+JOIN slots AS slot2 ON slot1.Год_Месяц = slot2.Год_Месяц
+GROUP BY slot1.facility, slot1.bookcost, slot1.Год_Месяц
+ORDER BY usage_percent ASC;
